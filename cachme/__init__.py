@@ -33,8 +33,8 @@ This exports:
   - MQCache is an implementation of the Multi-Queue cache
   - MRUCache is a Most Recently Used cache
   - NMRUCache is a Not Most Recently Used cache
-  - RandomCache is a random key removal cache
-  - SLRU is a Segmented Least Recently Used cache
+  - RRCache is a Random Replacement cache
+  - SLRUCache is a Segmented Least Recently Used cache
   - StaticCache is a simple cache with no key eviction
   - TLRUCache is a Time-aware Least Recently Used cache
   - TwoQCache is an implementation of the simple 2Q algorithm
@@ -43,7 +43,7 @@ This exports:
 
 
 __all__ = ['cache', 'BaseCache', 'FIFOCache', 'LFUCache', 'LRUCache', 'MFUCache', 'MQCache', 'MRUCache', 'NMRUCache',
-           'RandomCache', 'SLRUCache', 'StaticCache', 'TLRUCache', 'TwoQCache', 'TwoQFullCache']
+           'RRCache', 'SLRUCache', 'StaticCache', 'TLRUCache', 'TwoQCache', 'TwoQFullCache']
 
 
 from abc import ABC, abstractmethod
@@ -1326,10 +1326,10 @@ class NMRUCache(BaseCache):
                 self._mru_item = _KeyValue(key, value)
 
 
-class RandomCache(BaseCache):
-    """Random key removal cache.
+class RRCache(BaseCache):
+    """Random replacement cache.
 
-    A Random key removal cache where keys are evicted randomly, regardless of access or insertion order. This uses a
+    A Random replacement cache where keys are evicted randomly, regardless of access or insertion order. This uses a
     simple hashmap for O(1) access and insertion time.
 
     :param size:

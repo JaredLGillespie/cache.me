@@ -1375,67 +1375,67 @@ class TestNMRUCache(unittest.TestCase):
         self.assertEqual(5, out11)
 
 
-class TestRandomCache(unittest.TestCase):
+class TestRRCache(unittest.TestCase):
 
     def test_invalid_size(self):
         with self.assertRaises(ValueError):
-            RandomCache(0)
+            RRCache(0)
 
     def test_current_size_when_empty(self):
-        rc = RandomCache(1)
+        rc = RRCache(1)
         self.assertEqual(0, rc.current_size)
 
     def test_current_size_with_items(self):
-        rc = RandomCache(2)
+        rc = RRCache(2)
         rc.put('key1', 1)
         rc.put('key2', 2)
         self.assertEqual(2, rc.current_size)
 
     def test_current_size_with_full_cache(self):
-        rc = RandomCache(2)
+        rc = RRCache(2)
         rc.put('key1', 1)
         rc.put('key2', 2)
         self.assertEqual(2, rc.current_size)
 
     def test_max_size(self):
-        rc = RandomCache(1)
+        rc = RRCache(1)
         self.assertEqual(1, rc.max_size)
 
     def test_hits_none(self):
-        rc = RandomCache(1)
+        rc = RRCache(1)
         rc.get('key', object())
         rc.get('key', object())
         self.assertEqual(0, rc.hits)
 
     def test_hits_some(self):
-        rc = RandomCache(2)
+        rc = RRCache(2)
         rc.put('key', object())
         rc.get('key', object())
         rc.get('key', object())
         self.assertEqual(2, rc.hits)
 
     def test_misses(self):
-        rc = RandomCache(1)
+        rc = RRCache(1)
         rc.get('key', object())
         rc.get('key', object())
         self.assertEqual(2, rc.misses)
 
     def test_misses_none(self):
-        rc = RandomCache(2)
+        rc = RRCache(2)
         rc.put('key', object())
         rc.get('key', object())
         rc.get('key', object())
         self.assertEqual(0, rc.misses)
 
     def test_clear_with_empty_cache(self):
-        rc = RandomCache(1)
+        rc = RRCache(1)
         rc.clear()
         self.assertEqual({}, rc._store)
         self.assertEqual(0, rc.hits)
         self.assertEqual(0, rc.misses)
 
     def test_clear_with_items(self):
-        rc = RandomCache(1)
+        rc = RRCache(1)
         rc.put('key1', 1)
         rc.put('key2', 2)
         rc.clear()
@@ -1444,19 +1444,19 @@ class TestRandomCache(unittest.TestCase):
         self.assertEqual(0, rc.misses)
 
     def test_get_key_in_cache(self):
-        rc = RandomCache(1)
+        rc = RRCache(1)
         rc.put('key', 1)
         out = rc.get('key', object())
         self.assertEqual(1, out)
 
     def test_get_key_not_in_cache(self):
-        rc = RandomCache(1)
+        rc = RRCache(1)
         sentinel = object()
         out = rc.get('key', sentinel)
         self.assertEqual(sentinel, out)
 
     def test_put_key_in_cache(self):
-        rc = RandomCache(1)
+        rc = RRCache(1)
         rc.put('key', 1)
         out = rc.get('key', object())
         self.assertEqual(1, out)
@@ -1464,7 +1464,7 @@ class TestRandomCache(unittest.TestCase):
         self.assertEqual(0, rc.misses)
 
     def test_put_existing_key_in_cache(self):
-        rc = RandomCache(1)
+        rc = RRCache(1)
         rc.put('key', 1)
         rc.put('key', 2)
         out = rc.get('key', object())
@@ -1474,7 +1474,7 @@ class TestRandomCache(unittest.TestCase):
 
     def test_key_evicts_when_full(self):
         sentinel = object()
-        rc = RandomCache(1)
+        rc = RRCache(1)
         rc.put('key1', 1)
         rc.put('key2', 2)
         out1 = rc.get('key1', sentinel)
