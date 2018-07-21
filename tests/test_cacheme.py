@@ -85,7 +85,7 @@ class TestCache(unittest.TestCase):
 
         cache(algo)(lambda x: x).cache_clear()
 
-        algo.clear.assert_called()
+        self.assertEqual(1, algo.clear.call_count)
 
     def test_dynamic_methods(self):
         def method_1(): return 1
