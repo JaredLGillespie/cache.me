@@ -296,11 +296,11 @@ class TestCache(unittest.TestCase):
         out = cache(algo)(func)(2, a=4)
         self.assertEqual(3, out)
 
-    def test_parameter_key_func(self):
+    def test_key_func(self):
         algo = Mock()
         algo.dynamic_methods = []
 
-        cache(algo, parameter_key_func=lambda x: ((0,), {}))(lambda x: x)(1)
+        cache(algo, key_func=lambda x: ((0,), {}))(lambda x: x)(1)
         algo.create_key.assert_called_once_with((0,), {}, False)
 
 

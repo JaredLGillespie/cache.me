@@ -101,7 +101,7 @@ class cache:
     :param on_miss:
         A callable function to be called when a cache miss occurs. A cache miss occurs when an entry isn't found in the
         cache. The function should accept a single value, the number of cache misses.
-    :param parameter_key_func:
+    :param key_func:
         A callable function to manipulate the arguments and keyword arguments being used to create the cache key. Should
         accept the same arguments and parameters as the calling function and return a tuple of the arguments and keyword
         arguments to use to create the cache key.
@@ -109,14 +109,14 @@ class cache:
     :type include_types: bool
     :type on_hit: callable
     :type on_miss: callable
-    :type parameter_key_func: callable
+    :type key_func: callable
     """
-    def __init__(self, algorithm, include_types=False, on_hit=None, on_miss=None, parameter_key_func=None):
+    def __init__(self, algorithm, include_types=False, on_hit=None, on_miss=None, key_func=None):
         self.algorithm = algorithm
         self.include_types = include_types
         self.on_hit = on_hit
         self.on_miss = on_miss
-        self.parameter_key_func = parameter_key_func
+        self.key_func = key_func
 
         # Dynamic methods
         for method in algorithm.dynamic_methods:
@@ -154,8 +154,8 @@ class cache:
         sentinel = object()
         key_args, key_kwargs = args, kwargs
 
-        if self.parameter_key_func:
-            key_args, key_kwargs = self.parameter_key_func(*args, **kwargs)
+        if self.key_func:
+            key_args, key_kwargs = self.key_func(*args, **kwargs)
 
         key = self.algorithm.create_key(key_args, key_kwargs, self.include_types)
 
@@ -792,8 +792,7 @@ class LRUCache(BaseCache):
     """Least Recently Used cache.
 
     A Least Recently Used cache where keys which have been accessed the least recently are evicted when the cache is
-    full. A linked list is used which evicts from the tail, appends at the head, and moves accesses to the head, which
-    yields O(1) access and insertion time.
+    full. A linked list is used to yield O(1) access and insertion time.
 
     :param size:
         The size of the cache. Once full, the least recently accessed item is evicted.
@@ -952,11 +951,11 @@ class MQCache(BaseCache):
     A Multi-Queue cache in which multiple queues are used to hold levels of varying temperature (i.e. highly accessed
     and less accessed) along with a history buffer (similar to 2Q). This is implemented based on the paper "The
     Multi-Queue Replacement Algorithm for Second Level Buffer Caches" which uses a LRU queues for each level. The access
-    count of each item is also recorded and used in determining which queue to promote the item in based on the
+    count of each item is also recorded and used in determining which queue to promote the item to based on the
     `queue_func` parameter.
 
     Items are also susceptible to being evicted over time. If an item isn't accessed within a certain time it is bumped
-    down to a lower queue and it's expiration time is reset. This continues if the item isn't accessed until it is
+    down to a lower queue and its expiration time is reset. This continues if the item isn't accessed until it is
     eventually evicted to the lowest queue.
 
     The history buffer is a FIFO queue that keeps track of items recently evicted from the queue. If an item is accessed
@@ -1540,7 +1539,7 @@ class StaticCache(BaseCache):
     """Static cache.
 
     A simple cache with no key eviction. The implementation is a simple key/value store with O(1) access and insertion
-    time. Keys are stored permanently, or at least until cleared.
+    time. Keys are stored permanently, or at least until the cache is cleared.
     """
     def __init__(self):
         super().__init__()
@@ -1753,12 +1752,12 @@ class TLRUCache(BaseCache):
 class TwoQCache(BaseCache):
     """2Q simple cache.
 
-    A cache implementation of the 2Q simple algorithm described in "2Q: A Low Overhead High Performance Buffer
-    Management Replacement Algorithm". Two queues are used, an LRU (the primary), and a FIFO (the secondary). Items are
-    initially placed into the secondary queue when placed into the cache. If the secondary queue is full, items are
-    evicted in the order of their arrival. If items are accessed while they are in the secondary queue, they are moved
-    to the primary queue. They stay in this queue until it is full and the key which has been least recently used is
-    evicted. This implementation yields O(1) access and insertion time.
+    The simple 2Q cache described by the algorithm in "2Q: A Low Overhead High Performance Buffer Management Replacement
+    Algorithm". Two queues are used, an LRU (the primary), and a FIFO (the secondary). Items are initially placed into
+    the secondary queue when placed into the cache. If the secondary queue is full, items are evicted in the order of
+    their arrival. If items are accessed while they are in the secondary queue, they are moved to the primary queue.
+    They stay in this queue until it is full and the key which has been least recently used is evicted. This
+    implementation yields O(1) access and insertion time.
 
     The `max_size` for the cache is the combined size of both the primary and secondary queue as both contain items.
 
@@ -1866,7 +1865,7 @@ class TwoQCache(BaseCache):
 class TwoQFullCache(BaseCache):
     """2Q full cache.
 
-    A cache implementation of the full 2Q algorithm described in "2Q: A Low Overhead High Performance Buffer Management
+    The full 2Q cache as described by the algorithm in "2Q: A Low Overhead High Performance Buffer Management
     Replacement Algorithm". Three queues are used, an LRU (the primary), and two FIFO (the secondary in and out). Items
     are initially placed into the secondary "in" queue when first placed into the cache. If this queue is full, items
     are moved in the order of their arrival into the secondary "out" queue. If items are accessed while they are in the
