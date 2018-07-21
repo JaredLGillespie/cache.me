@@ -27,6 +27,7 @@ This exports:
   - cache is the function decorator
   - BaseCache is an abstract class other caching classes derive from
   - FIFOCache is a First-in First-out cache
+  - LIFOCache is a Last-in First-out cache
   - LFUCache is a Least Frequently Used cache
   - LRUCache is a Least Recently Used cache
   - MFUCache is a Most Frequently Used cache
@@ -42,8 +43,8 @@ This exports:
 """
 
 
-__all__ = ['cache', 'BaseCache', 'FIFOCache', 'LFUCache', 'LRUCache', 'MFUCache', 'MQCache', 'MRUCache', 'NMRUCache',
-           'RRCache', 'SLRUCache', 'StaticCache', 'TLRUCache', 'TwoQCache', 'TwoQFullCache']
+__all__ = ['cache', 'BaseCache', 'FIFOCache', 'LIFOCache', 'LFUCache', 'LRUCache', 'MFUCache', 'MQCache', 'MRUCache',
+           'NMRUCache', 'RRCache', 'SLRUCache', 'StaticCache', 'TLRUCache', 'TwoQCache', 'TwoQFullCache']
 
 
 from abc import ABC, abstractmethod
@@ -704,6 +705,78 @@ class FIFOCache(BaseCache):
             if key not in self._map:
                 if len(self._map) >= self._max_size:
                     self._map.pop(self._queue.pop())
+                self._queue.appendleft(key)
+            self._map[key] = value
+
+
+class LIFOCache(BaseCache):
+    """Last-in First-out cache.
+
+    A Last-in First-out cache where keys are evicted in reverse order of arrival when the cache is full. Accessing a key
+    does not change the order of eviction. This uses the `deque` class for O(1) access and insertion time.
+
+    :param size:
+        The size of the cache. Once full, items are evicted in a FIFO manner.
+    :type size: int
+    """
+    def __init__(self, size):
+        super().__init__()
+        self._max_size = size
+        self._lock = RLock()
+
+        # Cache info
+        self._hits = 0
+        self._misses = 0
+
+        # Data storage
+        self._map = {}
+        self._queue = deque()
+
+        # Validate parameters
+        self._validations()
+
+    def _validations(self):
+        if self._max_size < 1:
+            raise ValueError('size should be > 0')
+
+    @property
+    def current_size(self):
+        return len(self._map)
+
+    @property
+    def hits(self):
+        return self._hits
+
+    @property
+    def max_size(self):
+        return self._max_size
+
+    @property
+    def misses(self):
+        return self._misses
+
+    def clear(self):
+        with self._lock:
+            self._map.clear()
+            self._queue.clear()
+
+            self._hits = 0
+            self._misses = 0
+
+    def get(self, key, sentinel):
+        with self._lock:
+            if key in self._map:
+                self._hits += 1
+                return self._map[key]
+
+            self._misses += 1
+            return sentinel
+
+    def put(self, key, value):
+        with self._lock:
+            if key not in self._map:
+                if len(self._map) >= self._max_size:
+                    self._map.pop(self._queue.popleft())
                 self._queue.appendleft(key)
             self._map[key] = value
 

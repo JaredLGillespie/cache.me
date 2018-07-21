@@ -114,6 +114,7 @@ Caching Algorithms
 The following caching algorithms are provided by the library (although others could be extended from the ``BaseCache``):
 
 - `FIFO (First-in First-out)`_
+- `LIFO (Last-in First-out`_
 - `LFU (Least Frequently Used)`_
 - `LRU (Least Recently Used)`_
 - `MQ (Multi-Queue)`_
@@ -141,6 +142,7 @@ insertions, and have the following methods and properties:
 - ``create_key(...)``: Creates a cache key.
 
 .. _FIFO (First-in First-out): https://en.wikipedia.org/wiki/Cache_replacement_policies#First_in_first_out_(FIFO)
+.. _LIFO (Last-in First-out: https://en.wikipedia.org/wiki/Cache_replacement_policies#Last_in_first_out_(LIFO)
 .. _LFU (Least Frequently Used): https://en.wikipedia.org/wiki/Cache_replacement_policies#Least-frequently_used_(LFU)
 .. _LRU (Least Recently Used): https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_recently_used_(LRU)
 .. _MQ (Multi-Queue): https://en.wikipedia.org/wiki/Cache_replacement_policies#Multi_queue_(MQ)
@@ -154,6 +156,18 @@ FIFO (First-in First-out)
 
 The ``FIFOCache`` is a First-in First-out cache where keys are evicted in order of arrival when the cache is full.
 Accessing a key does not change the order of eviction.
+
+.. code-block:: python
+
+    @cache(FIFOCache(size=50))
+    def func(...)
+        ...
+
+LIFO (First-in First-out)
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``LIFOCache`` is a Last-in First-out cache where keys are evicted in reverse order of arrival when the cache is
+full. Accessing a key does not change the order of eviction.
 
 .. code-block:: python
 

@@ -449,13 +449,147 @@ class TestFIFOCache(unittest.TestCase):
 
     def test_key_evicts_when_full(self):
         sentinel = object()
-        fc = FIFOCache(1)
+        fc = FIFOCache(2)
         fc.put('key1', 1)
         fc.put('key2', 2)
         out1 = fc.get('key1', sentinel)
+
+        # key2 gets evicted
+        fc.put('key3', 3)
+
+        # key1 gets evicted
+        fc.put('key4', 4)
         out2 = fc.get('key2', sentinel)
-        self.assertEqual(sentinel, out1)
-        self.assertEqual(2, out2)
+        out3 = fc.get('key3', sentinel)
+        out4 = fc.get('key4', sentinel)
+        out5 = fc.get('key1', sentinel)
+        self.assertEqual(1, out1)
+        self.assertEqual(sentinel, out2)
+        self.assertEqual(3, out3)
+        self.assertEqual(4, out4)
+        self.assertEqual(sentinel, out5)
+
+
+class TestLIFOCache(unittest.TestCase):
+
+    def test_invalid_size(self):
+        with self.assertRaises(ValueError):
+            LIFOCache(0)
+
+    def test_current_size_when_empty(self):
+        lc = LIFOCache(1)
+        self.assertEqual(0, lc.current_size)
+
+    def test_current_size_with_items(self):
+        lc = LIFOCache(2)
+        lc.put('key1', 1)
+        lc.put('key2', 2)
+        self.assertEqual(2, lc.current_size)
+
+    def test_current_size_with_full_cache(self):
+        lc = LIFOCache(2)
+        lc.put('key1', 1)
+        lc.put('key2', 2)
+        self.assertEqual(2, lc.current_size)
+
+    def test_max_size(self):
+        lc = LIFOCache(1)
+        self.assertEqual(1, lc.max_size)
+
+    def test_hits_none(self):
+        lc = LIFOCache(1)
+        lc.get('key', object())
+        lc.get('key', object())
+        self.assertEqual(0, lc.hits)
+
+    def test_hits_some(self):
+        lc = LIFOCache(2)
+        lc.put('key', object())
+        lc.get('key', object())
+        lc.get('key', object())
+        self.assertEqual(2, lc.hits)
+
+    def test_misses(self):
+        lc = LIFOCache(1)
+        lc.get('key', object())
+        lc.get('key', object())
+        self.assertEqual(2, lc.misses)
+
+    def test_misses_none(self):
+        lc = LIFOCache(2)
+        lc.put('key', object())
+        lc.get('key', object())
+        lc.get('key', object())
+        self.assertEqual(0, lc.misses)
+
+    def test_clear_with_empty_cache(self):
+        lc = LIFOCache(1)
+        lc.clear()
+        self.assertEqual({}, lc._map)
+        self.assertEqual(0, len(lc._queue))
+        self.assertEqual(0, lc.hits)
+        self.assertEqual(0, lc.misses)
+
+    def test_clear_with_items(self):
+        lc = LIFOCache(1)
+        lc.put('key1', 1)
+        lc.put('key2', 2)
+        lc.clear()
+        self.assertEqual({}, lc._map)
+        self.assertEqual(0, len(lc._queue))
+        self.assertEqual(0, lc.hits)
+        self.assertEqual(0, lc.misses)
+
+    def test_get_key_in_cache(self):
+        lc = LIFOCache(1)
+        lc.put('key', 1)
+        out = lc.get('key', object())
+        self.assertEqual(1, out)
+
+    def test_get_key_not_in_cache(self):
+        lc = LIFOCache(1)
+        sentinel = object()
+        out = lc.get('key', sentinel)
+        self.assertEqual(sentinel, out)
+
+    def test_put_key_in_cache(self):
+        lc = LIFOCache(1)
+        lc.put('key', 1)
+        out = lc.get('key', object())
+        self.assertEqual(1, out)
+        self.assertEqual(1, lc.hits)
+        self.assertEqual(0, lc.misses)
+
+    def test_put_existing_key_in_cache(self):
+        lc = LIFOCache(1)
+        lc.put('key', 1)
+        lc.put('key', 2)
+        out = lc.get('key', object())
+        self.assertEqual(2, out)
+        self.assertEqual(1, lc.hits)
+        self.assertEqual(0, lc.misses)
+
+    def test_key_evicts_when_full(self):
+        sentinel = object()
+        lc = LIFOCache(2)
+        lc.put('key1', 1)
+        lc.put('key2', 2)
+        out1 = lc.get('key1', sentinel)
+
+        # key2 gets evicted
+        lc.put('key3', 3)
+
+        # key3 gets evicted
+        lc.put('key4', 4)
+        out2 = lc.get('key2', sentinel)
+        out3 = lc.get('key3', sentinel)
+        out4 = lc.get('key4', sentinel)
+        out5 = lc.get('key1', sentinel)
+        self.assertEqual(1, out1)
+        self.assertEqual(sentinel, out2)
+        self.assertEqual(sentinel, out3)
+        self.assertEqual(4, out4)
+        self.assertEqual(1, out5)
 
 
 class TestLFUCache(unittest.TestCase):
