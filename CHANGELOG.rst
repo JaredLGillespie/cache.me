@@ -9,6 +9,12 @@ The format is based on `Keep a Changelog`_ and this project adheres to `Semantic
 
 `Unreleased`_
 -------------
+
+`0.1.0`_ - 2018-07-21
+---------------------
+Added
+^^^^^
 - Initial version
 
-.. _Unreleased: https://github.com/JaredLGillespie/cache.me/compare/...HEAD
+.. _Unreleased: https://github.com/JaredLGillespie/cache.me/compare/v0.1.0...HEAD
+.. _0.1.0: https://github.com/JaredLGillespie/cache.me/releases/tag/v0.1.0
