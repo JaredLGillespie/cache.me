@@ -178,7 +178,10 @@ class cache:
 
     def cache_info(self):
         """Report cache statistics."""
-        return _CacheInfo(self.algorithm.hits, self.algorithm.misses, self.algorithm.current_size, self.algorithm.max_size)
+        return _CacheInfo(self.algorithm.hits,
+                          self.algorithm.misses,
+                          self.algorithm.current_size,
+                          self.algorithm.max_size)
 
     def cache_clear(self):
         """Clear the cache and cache statistics."""
@@ -1201,7 +1204,7 @@ class MQCache(BaseCache):
             while node and node.expire_time < self._current_time:
                 key = self._queues[k].pop().key
                 expire_time = self._current_time + self._expire_time
-                self._queues[k-1].append(key, expire_time)
+                self._queues[k - 1].append(key, expire_time)
                 node = self._queues[k].peek()
 
     def _evict_block(self):
@@ -1994,7 +1997,6 @@ class TwoQFullCache(BaseCache):
 
         if self._secondary_out_size < 1:
             raise ValueError('secondary_out_size should be > 0')
-
 
     @property
     def current_size(self):
