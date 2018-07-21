@@ -413,7 +413,7 @@ function variations are shown below.
 In addition to the ``cache_info()`` and ``cache_clear()`` methods bound to the function, others can be dynamically bound
 to the function depending on the algorithm. None of the current basic implementations use this functionality, but this
 has a case for when creating one's own or extending the existing algorithms. The dynamic methods are prefixed with
-'cache_'.
+"cache_<method-name>".
 
 .. code-block:: python
 
