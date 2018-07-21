@@ -1637,7 +1637,7 @@ class StaticCache(BaseCache):
 
     @property
     def max_size(self):
-        return math.inf
+        return float('inf')
 
     @property
     def misses(self):
@@ -1731,7 +1731,7 @@ class TLRUCache(BaseCache):
     @property
     def max_size(self):
         if self._max_size is None:
-            return math.inf
+            return float('inf')
         return self._max_size
 
     @property

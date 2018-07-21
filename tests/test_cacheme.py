@@ -20,7 +20,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import math
 import unittest
 from unittest.mock import Mock
 from cachme import *
@@ -1806,7 +1805,7 @@ class TestStaticCache(unittest.TestCase):
 
     def test_max_size(self):
         sc = StaticCache()
-        self.assertEqual(math.inf, sc.max_size)
+        self.assertEqual(float('inf'), sc.max_size)
 
     def test_hits_none(self):
         sc = StaticCache()
@@ -1912,7 +1911,7 @@ class TestTLRUCache(unittest.TestCase):
 
     def test_max_size_without_size(self):
         tc = TLRUCache(1)
-        self.assertEqual(math.inf, tc.max_size)
+        self.assertEqual(float('inf'), tc.max_size)
 
     def test_hits_none(self):
         tc = TLRUCache(1)
