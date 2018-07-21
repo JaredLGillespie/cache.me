@@ -629,12 +629,12 @@ class BaseCache(ABC):
         key = args
         if kwargs:
             key += kwarg_mark
-            for item in kwargs.items():
+            for item in sorted(kwargs.items()):
                 key += item
         if typed:
             key += tuple(type(v) for v in args)
             if kwargs:
-                key += tuple(type(v) for v in kwargs.values())
+                key += tuple(type(v) for k, v in sorted(kwargs.items()))
         elif len(key) == 1 and type(key[0]) in fast_types:
             return key[0]
         return _HashList(key)
