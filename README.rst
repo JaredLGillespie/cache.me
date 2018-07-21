@@ -171,7 +171,7 @@ full. Accessing a key does not change the order of eviction.
 
 .. code-block:: python
 
-    @cache(FIFOCache(size=50))
+    @cache(LIFOCache(size=50))
     def func(...)
         ...
 
