@@ -38,13 +38,13 @@ Installation
 
 The latest version of cache.me is available via ``pip``:
 
-.. code-block:: python
+.. code-block:: bash
 
     pip install cache.me
 
 Alternatively, you can download and install from source:
 
-.. code-block:: python
+.. code-block:: bash
 
     python setup.py install
 
