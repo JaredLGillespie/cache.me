@@ -160,7 +160,7 @@ class cache:
 
         key = self.algorithm.create_key(key_args, key_kwargs, self.include_types)
 
-        ret = self.algorithm.get(sentinel, key)
+        ret = self.algorithm.get(key, sentinel)
 
         if ret != sentinel:
             if self.on_hit is not None:
